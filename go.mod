@@ -1,4 +1,4 @@
-module github.com/shinesyang/common/logger
+module github.com/shinesyang/go_logger
 
 go 1.18
 

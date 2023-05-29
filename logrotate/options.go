@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/shinesyang/common/logger/control"
+	"github.com/shinesyang/go_logger/control"
 )
 
 type OptionsFunc func(*RotateLog)

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shinesyang/common/logger/ticker"
+	"github.com/shinesyang/go_logger/ticker"
 )
 
 type RotateLog struct {
