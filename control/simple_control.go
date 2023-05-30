@@ -4,37 +4,32 @@ import (
 	"fmt"
 	"os"
 	"time"
-)
 
-// 判断文件存在
-func pathExists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
+	"github.com/shinesyang/go_logger/lib"
+)
 
 type SimpleControl struct {
 }
 
 func (s *SimpleControl) RotateFilePath(filePath string, afterTime time.Time) string {
 	// 检查判断filePath是否存在
-	if ok, err := pathExists(filePath); err != nil || !ok {
+	if ok, err := lib.PathExists(filePath); err != nil || !ok {
 		fmt.Printf("文件不存在或者查询出错: %v\n", err)
 		return filePath
 	}
 
-	// 将当天日志文件重新命名为隔天的
-	yesterdayTime := afterTime.Add(-time.Hour * 24)
-	yesterdayTimeString := yesterdayTime.Format("20060102")
-	latestLogPath := filePath + "." + yesterdayTimeString
-	if err := os.Rename(filePath, latestLogPath); err != nil {
-		fmt.Printf("文件重命名失败: %v\n", err)
+	finfo, _ := os.Stat(filePath) // 获取文件信息
+
+	if finfo.Size() > 0 {
+		// 将当天日志文件重新命名为隔天的
+		yesterdayTime := afterTime.Add(-time.Hour * 24)
+		yesterdayTimeString := yesterdayTime.Format("20060102")
+		latestLogPath := filePath + "." + yesterdayTimeString
+		if err := os.Rename(filePath, latestLogPath); err != nil {
+			fmt.Printf("文件重命名失败: %v\n", err)
+		}
 	}
+
 	return filePath
 }
 
@@ -45,7 +40,7 @@ func (s *SimpleControl) RotateFilePath(filePath string, afterTime time.Time) str
 */
 func (s *SimpleControl) WithFilePath(filePath string, now time.Time) string {
 	// 检查判断filePath是否存在
-	if ok, err := pathExists(filePath); err != nil || !ok {
+	if ok, err := lib.PathExists(filePath); err != nil || !ok {
 		return filePath
 	}
 
@@ -58,7 +53,7 @@ func (s *SimpleControl) WithFilePath(filePath string, now time.Time) string {
 	nowTimeString := now.Format("20060102")
 
 	// 用文件创建时间组成一个新的文件
-	if formatTimeString != nowTimeString {
+	if formatTimeString != nowTimeString && finfo.Size() > 0 {
 		fileDatePath := filePath + "." + formatTimeString
 		if err := os.Rename(filePath, fileDatePath); err != nil {
 			fmt.Printf("文件重命名失败: %v\n", err)
